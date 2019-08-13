@@ -1,0 +1,14 @@
+{
+    "name": "flk-router",
+    "description": "Routing handler for Falak framework.",
+    "version": "0.1.54",
+    "main": "src/index.js",
+    "author": {
+        "email": "hassanzohdy@gmail.com",
+        "name": "Hasan Zohdy"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/falakjs/flk-router"
+    }
+}
