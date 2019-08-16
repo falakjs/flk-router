@@ -205,13 +205,19 @@ class Router {
      * Build current route and cache it in a property
      */
     _buildCurrentRoute() {
-        let currentUrl = this.url().rtrim('/') + '/';
+        let currentUrl = this.url().rtrim('/');
 
-        let route = '/' + currentUrl.ltrim(SCRIPT_URL).trim('/') + '/';
+        let route = '/' + currentUrl.ltrim(SCRIPT_URL.rtrim('/')).trim('/');
 
-        // remove the locale from the url
-        let regex = new RegExp(`^\/${Config.get('app.localeCode')}`);
-        route = route.replace(regex, '/').replace(/\/+/, '/');
+        let localeCode = Config.get('app.localeCode');
+        let regex = new RegExp(`^\/${localeCode}`);
+
+        if (route.trim('/') == localeCode) {
+            route = '/';
+        } else if (route.startsWith(`/${localeCode}/`)) {            
+            // remove the locale from the url
+            route = route.replace(regex, '/').replace(/\/+/, '/');
+        }
 
         // decode the url if it has any uft8 encoding
         route = decodeURIComponent(route);
