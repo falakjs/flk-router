@@ -156,49 +156,48 @@ class Router {
             let route = Router.list[routePath],
                 matches = currentRoute.match(route.pattern);
 
-            if (matches) {
-                delete matches[0];
+            if (!matches) continue;
 
-                let params = Array.reset(matches);
+            delete matches[0];
 
-                let paramValues = {};
-                if (!Is.empty(route.paramsList)) {
-                    for (let i = 0; i < params.length; i++) {
-                        paramValues[route.paramsList[i]] = params[i];
-                    }
-                } else {
-                    paramValues = matches;
+            let params = Array.reset(matches);
+
+            let paramValues = {};
+            if (!Is.empty(route.paramsList)) {
+                for (let i = 0; i < params.length; i++) {
+                    paramValues[route.paramsList[i]] = params[i];
                 }
-
-                route.params = paramValues;
-
-                route.route = currentRoute;
-
-                // store all parameters in the params property
-                this.params = route.params;
-
-                this.current = route;
-
-                this.Layout.newPage(route);
-
-                if (this.events.trigger('router.navigation', currentRoute, this) === false) return;
-
-                this.Layout.render();
-
-                let hash = this.hash();
-
-                // if the url contains hash, scroll to it
-                if (hash) {
-                    setTimeout(() => {
-                        let element = document.getElementById(hash);
-                        if (element) {
-                            element.scrollIntoView(true);
-                        }
-                    }, 0);
-                }
-
-                break;
+            } else {
+                paramValues = matches;
             }
+
+            route.params = paramValues;
+
+            route.route = currentRoute;
+
+            // store all parameters in the params property
+            this.params = route.params;
+
+            this.current = route;
+
+            this.Layout.newPage(route);
+
+            if (this.events.trigger('router.navigation', currentRoute, this) === false) return;
+
+            this.Layout.render();
+
+            let hash = this.hash();
+
+            // if the url contains hash, scroll to it
+            if (hash) {
+                setTimeout(() => {
+                    let element = document.getElementById(hash);
+                    if (element) {
+                        element.scrollIntoView(true);
+                    }
+                }, 0);
+            }
+            break;
         }
     }
 
@@ -237,40 +236,23 @@ class Router {
                 hrefOnly = btn.attr('href'),
                 href = this.href;
 
-            // make sure the url is starting with the script url not base url 
-            if (href.startsWith(BASE_URL) && !href.startsWith(SCRIPT_URL)) {
-                href = href.replaceFirst(BASE_URL, SCRIPT_URL);
+            if (!href || btn.hasClass('navigatable')) return;
+
+            // If the href starts with / then generate full path  
+            if (hrefOnly && !Is.url(hrefOnly)) {
+                this.href = href = url(hrefOnly);
             }
-
-
-            if (!href) return;
 
             // if user clicks ctrl with the mouse click
             // then we will allow him to open the url in new window
-            if (!href || e.ctrlKey || btn.attr('target') == '_blank') {
-                if (href && href.startsWith('/')) {
-                    this.href = url(href);
-                }
-
-                return;
-            }
+            if (e.ctrlKey || btn.attr('target') == '_blank') return;
 
             if (hrefOnly.startsWith('#')) {
                 this.href = $this.url().split('#')[0] + hrefOnly;
-                href = this.href;
                 return;
             }
 
-            if (btn.hasClass('normal-link')) {
-                return;
-            }
-
-            if (href.startsWith('/')) {
-                e.preventDefault();
-                $this.navigateTo(href);
-            } else if (href.startsWith('javascript')) {
-                return false;
-            } else if (href.startsWith(BASE_URL)) {
+            if (href.startsWith(BASE_URL)) {
                 e.preventDefault();
                 $this.navigateToUrl(href);
             } else {
