@@ -83,7 +83,7 @@ Navigate to the given `route`.
 
 This method probably the most used method you may use in this package.
 
-It always you to manually navigate to a certain route
+It allows you to manually navigate to a certain route
 
 > Always pass the route start with the `/` i.e `/users`
 
